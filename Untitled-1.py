@@ -22,5 +22,30 @@ print(c.strip()) #kenardaki bosluklari siler
 c="*empty*"
 print(c.strip("*")) #*lari siler
 
+
+#boyle yaparsak hicbir sey silinmez
+f= " empty "
+print(f)
+print(f.strip(""))
+
 print(dir(c)) #c degiskeni icin kullanilabilecek tum metotları gosterir
 
+
+#################################################################################
+
+gel_yaz = "gelecegi_yazanlar"
+
+print(gel_yaz[0]) #0. karakteri yazar
+
+print(gel_yaz[1:3]) #1. indexten 3. indexe kadar yazar. 3. dahil degil!!!
+
+######## Tip Donusumleri #########
+
+birinci_sayi=23
+print(type(birinci_sayi))
+print(type(str(birinci_sayi)))
+
+print("gelecegi","yazanlar")
+print("gelecegi","yazanlar", sep = "_")
+
+print("9"+"1") #cikti 91 olur
