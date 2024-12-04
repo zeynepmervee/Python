@@ -73,7 +73,7 @@ sozluk[t]="yeni" #tuple sabit oldugu icin sozluk'un key'i olarak kullanilabilir
 print(sozluk)
 
 
-print("**************************SETLER**********************")
+print("**************************SETLER************************")
 
 l=[1,3,4,"sad"]
 s=set(l)
