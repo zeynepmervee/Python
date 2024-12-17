@@ -136,3 +136,24 @@ for i in range(C.shape[0]):  # 3
 print("G shape: ",np.array(G).shape)
 
 #carpim yaparken NxM * MxN olmali
+
+#Stacking - Istifleme - Dizi Birlestirme
+
+import numpy as np
+dizi1=np.array([[1,2],[3,4]])
+print(dizi1)
+dizi2=np.array([[5,6],[7,8]])
+print(dizi2)
+dizi_dikey=np.vstack((dizi1,dizi2)) 
+print(dizi_dikey)
+dizi_yatay=np.hstack((dizi1,dizi2)) 
+print(dizi_yatay)
+
+import numpy as np
+ar1=np.array([[3,2],[5,6]])
+ar2=np.array([[1,3],[5,3]])
+dizi_dikey=np.vstack((ar1,ar2)) 
+print(dizi_dikey)
+dizi_yatay=np.hstack((ar1,ar2))
+print(dizi_yatay)
+
