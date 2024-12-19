@@ -109,10 +109,56 @@ max_maas=0
 max_isim=""
 
 
-# Ankara'da yaşayanlar için yeni bir DataFrame (reset_index ile indeksi sıfırlama)
-ankarada_yasayanlar = veri[veri["sehir"] == "ankara"].reset_index(drop=True)
+# Ankara'da yaşayanlar için yeni bir DataFrame (reset_index ile indeksi sıfırlama), bunu yapmazsak kod hata verir
+ankarada_yasayanlar = veri[veri["sehir"] == "ankara"].reset_index(drop=True) 
 for i in range(len(ankarada_yasayanlar)):
     if ankarada_yasayanlar["maas"][i]>max_maas:
         max_maas=ankarada_yasayanlar["maas"][i]
         max_isim=ankarada_yasayanlar["isim"][i]
 print(max_isim)
+
+#List Comprehension
+import pandas as pd
+dictionary = {
+    "isim": ["ali", "veli", "kenan", "murat", "ayse", "hilal"],
+    "yas": [15, 34, 24, 32, 33, 45],
+    "sehir": ["izmir","ankara","konya","ankara","antalya","trabzon"]
+}
+veri = pd.DataFrame(dictionary)
+#ortalama yas
+#bu yastan buyuk ve kucuk olanları filtrele
+#yeni feature türetelim yasgrubu adinda, altına da yasi ortalamadan kucukse kucuk, buyukse buyuk yazsin
+
+# 1-yas sutununu elde et
+veri_yas=veri.yas
+print(veri_yas)
+# 2-yas sutunu ortalamasi bul
+import numpy as np
+veri_yas_mean=np.mean(veri_yas)
+print(f"veri_yas_mean = {veri_yas_mean}")
+# 3-for dongusu ile insanlarin yasini ortalama ile kıyasla
+# yaslari kucukse bir listeye kucuk yazdir, buyukse buyuk yazdir
+liste_yas_grubu=[]
+
+for i in range(len(veri_yas)):
+    if veri_yas_mean>veri_yas[i]:
+        liste_yas_grubu.append("kucuk")
+    else:
+        liste_yas_grubu.append("buyuk")
+
+print(liste_yas_grubu)
+veri["yas_grubu"] = liste_yas_grubu
+print(veri)
+
+veri["yas_grubu2"]=["kucuk" if veri_yas_mean > veri_yas[i] else "buyuk" for i in range(len(veri_yas))]
+print(veri)
+
+veri["YAS_GRUBU2"] = [i.upper() for i in veri.yas_grubu2]
+print(veri)
+
+
+# tum satirlara bakalim eger ankarada yasayan varsa, yasini x 2 , else yas x 5
+# new_yas sutun olusturalim
+
+veri["new_yas"]=[veri.yas[i]*2 if veri.sehir[i]=="ankara" else veri.yas[i]*5 for i in range(len(veri))]
+print(veri)
