@@ -1,7 +1,38 @@
 import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
 
-# CSV dosyasını yükle
-iris_data = pd.read_csv("iris-1.csv")
+veri = pd.read_csv("iris-1.csv")  # CSV dosyasını yükle
 
-# İlk 5 satırı görüntüle
-print(iris_data.head())
+print(veri.head())
+print("*********************************************")
+print(veri.tail())
+print("*********************************************")
+print(veri.columns)
+print("*********************************************")
+print(veri.info())
+print("*********************************************")
+print(veri.describe())
+print("*********************************************")
+
+# Line Plot (Çizgi Grafiği)
+plt.figure(figsize=(6, 2))
+plt.plot(veri["Id"], veri["SepalLengthCm"], color="red", alpha=0.8, label="Sepal Length")
+plt.plot(veri["Id"], veri["SepalWidthCm"], color="blue", alpha=0.7, label="Sepal Width")
+plt.title("Graph")
+plt.xlabel("ID")
+plt.ylabel("SepalLength-SepalWidth")
+plt.grid(True)
+plt.legend() 
+plt.show()
+
+# Scatter Plot (Dağılım Grafiği)
+plt.figure()
+plt.scatter(veri["SepalLengthCm"], veri["PetalLengthCm"], color="blue", alpha=0.6)
+plt.title("SepalLength-PetalLength")
+plt.xlabel("Sepal Length (cm)")
+plt.ylabel("Petal Length (cm)")
+plt.grid(True)
+plt.show()
+
+
