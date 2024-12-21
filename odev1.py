@@ -3,7 +3,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 veri = pd.read_csv("iris-1.csv")  # CSV dosyasını yükle
-
+"""
 print(veri.head())
 print("*********************************************")
 print(veri.tail())
@@ -34,5 +34,16 @@ plt.xlabel("Sepal Length (cm)")
 plt.ylabel("Petal Length (cm)")
 plt.grid(True)
 plt.show()
+"""
+#histogram
+plt.figure()
+plt.hist(veri["SepalLengthCm"], color = "red", alpha = 0.6, bins=20 , label = "SepalLengthCm")
+plt.hist(veri["PetalLengthCm"], color = "blue", alpha = 0.6, bins=20 , label = "PetalLengthCm")
+#bins=20 demek 20 sutun olacak demek
 
+plt.ylabel("Frekans (Kaç adet olduğu)")
+plt.xlabel("cm")
+plt.legend()
+plt.show()
 
+#subplots
