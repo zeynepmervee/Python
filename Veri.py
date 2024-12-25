@@ -1,151 +1,85 @@
 import pandas as pd
-
-# veriyi iceriye aktar
-veri = pd.read_csv("olimpiyatlar.csv")
-veri_head = veri.head(15)
-"""
-veride nan degerler var, cikart veya doldur
-games columnı gereksiz, veriden drop
-her sporcu madalya almamis: madalya nan = madalya alamamis
-id gereksiz
-bir kisi iki takima katilmis? 1900 yilinda orada iki ulke varmiydi
-ülke kısaltması yada takim gereksiz.
-1920 den oncesi acaba guvenilir veri mi?
-"""
-
-veri.info()
-
-# sutun isimlerinin duzenlenmesi
-column = veri.columns
-veri.rename(columns = {
-    "ID" : "id",
-    "Name" : "isim",
-    "Sex" : "cinsiyet",
-    "Age" : "yas",
-    "Height" : "boy",
-    "Weight" : "kilo",
-    "Team" : "takim",
-    "NOC": "uok", # ulusal olimpiyat komite
-    "Games" : "oyunlar",
-    "Year" : "yil",
-    "Season" :"sezon",
-    "City" : "sehir",
-    "Sport" : "spor",
-    "Event" : "etkinlik",
-    "Medal" : "madalya"
-    }, inplace = True)
-
-# gereksiz/yararsiz verinin cikarilmasi
-veri = veri.drop(["oyunlar"], axis = 1) 
-veri_head = veri.head(15)
-veri_duplicated = veri[veri.duplicated()] # birbirini tekrarlayan veri
-
-# %% kayip veri problemi
-
-"""
-boy ve kilo sutununda bulunan kayip verileri dolduralim (etkinlik ortalamasi) ?
-ortalama veya  medyan? bu veri seti icin fark etmez.
-madalya alamayan sporculari veri setinden cikartalim
-
-"""
-# ortalama veya  medyan?
-import matplotlib.pyplot as plt
 import numpy as np
+import matplotlib.pyplot as plt
 
-plt.figure()
-plt.hist(veri.boy, bins = 100)
-plt.title("boy")
+# Veriyi içeriye aktar
+veri = pd.read_csv("olimpiyatlar.csv")
 
-plt.figure()
-plt.hist(veri.kilo, bins = 100)
-plt.title("kilo")
+# Sütun isimlerinin düzenlenmesi
+veri.rename(columns={
+    "ID": "id",
+    "Name": "isim",
+    "Sex": "cinsiyet",
+    "Age": "yas",
+    "Height": "boy",
+    "Weight": "kilo",
+    "Team": "takim",
+    "NOC": "uok",
+    "Games": "oyunlar",
+    "Year": "yil",
+    "Season": "sezon",
+    "City": "sehir",
+    "Sport": "spor",
+    "Event": "etkinlik",
+    "Medal": "madalya"
+}, inplace=True)
 
-describe = veri.describe()
+# Gereksiz sütunların çıkarılması
+veri.drop(["oyunlar"], axis=1, inplace=True)
 
-# boy ve kilo sutununda bulunan kayip verileri dolduralim (etkinlik ortalamasi)
+# Boy ve kilo sütununda bulunan kayıp verileri dolduralım (etkinlik ortalaması)
+essiz_etkinlik = pd.unique(veri.etkinlik)
+boy_kilo_list = ["boy", "kilo"]
+veri_gecici = veri.copy()
 
-# unique etkinliklerin ve sayisinin bulunmasi
-essiz_etkinlik = pd.unique(veri.etkinlik) 
+"""
+for e in essiz_etkinlik:
+    etkinlik_filtresi = veri_gecici["etkinlik"] == e
+    veri_filtreli = veri_gecici.loc[etkinlik_filtresi]
 
-veri_gecici = veri.copy() # gercek veriyi kaybetmemek icin kopyala
-
-boy_kilo_list = ["boy", "kilo"] # kayip veri sorunu olan sutunlar
-
-for e in essiz_etkinlik: # etkinlik ozelinde iterasyona basla
-    
-    # etkinlik filtresi olustur
-    etkinlik_filtresi = veri_gecici.etkinlik == e
-
-    # veriyi etkinlige gore filtrele
-    veri_filtreli = veri_gecici[etkinlik_filtresi]
-    
-    # boy ve kilo icin etkinlik ozelinde ortalam bul
     for s in boy_kilo_list:
-        
         ortalama = np.mean(veri_filtreli[s])
-        
-        if np.isnan(ortalama) == False:
-            veri_filtreli[s] = veri_filtreli[s].fillna(ortalama)
+        if not np.isnan(ortalama):
+            veri_gecici.loc[etkinlik_filtresi, s] = veri_filtreli[s].fillna(ortalama)
         else:
             tum_veri_ortalamasi = np.mean(veri[s])
-            veri_filtreli[s] = veri_filtreli[s].fillna(tum_veri_ortalamasi)
-
-    veri_gecici[etkinlik_filtresi] = veri_filtreli
+            veri_gecici.loc[etkinlik_filtresi, s] = veri_filtreli[s].fillna(tum_veri_ortalamasi)
 
 veri = veri_gecici.copy()
-veri.info()
 
-# yas da bulunan kayip veri sorununu cinsiyet ve spora gore dolduralim
-essiz_cinsiyet = pd.unique(veri.cinsiyet) 
-essiz_spor = pd.unique(veri.spor) 
+# Yaş sütunundaki kayıp verileri dolduralım (cinsiyet ve spor ortalaması)
+essiz_cinsiyet = pd.unique(veri.cinsiyet)
+essiz_spor = pd.unique(veri.spor)
 
-veri_gecici = veri.copy() # gercek veriyi kaybetmemek icin kopyala
-
-for c in essiz_cinsiyet: 
+for c in essiz_cinsiyet:
     for s in essiz_spor:
-    
-        # cinsiyet ve spor filtresi olustur
-        cinsiyet_spor_filtresi = np.logical_and(veri_gecici.cinsiyet == c, veri_gecici.spor == s)
-    
-        # veriyi etkinlige gore filtrele
-        veri_filtreli = veri_gecici[cinsiyet_spor_filtresi]
-        
+        cinsiyet_spor_filtresi = (veri["cinsiyet"] == c) & (veri["spor"] == s)
+        veri_filtreli = veri.loc[cinsiyet_spor_filtresi]
         ortalama = np.mean(veri_filtreli["yas"])
-        
-        if np.isnan(ortalama) == False:
-            veri_filtreli["yas"] = veri_filtreli["yas"].fillna(ortalama)
+
+        if not np.isnan(ortalama):
+            veri.loc[cinsiyet_spor_filtresi, "yas"] = veri_filtreli["yas"].fillna(ortalama)
         else:
             tum_veri_ortalamasi = np.mean(veri["yas"])
-            veri_filtreli["yas"] = veri_filtreli["yas"].fillna(tum_veri_ortalamasi)
+            veri.loc[cinsiyet_spor_filtresi, "yas"] = veri_filtreli["yas"].fillna(tum_veri_ortalamasi)
 
-        veri_gecici[cinsiyet_spor_filtresi] = veri_filtreli
+# Madalya almayan sporcuları çıkaralım
+veri = veri[~veri["madalya"].isnull()]
 
-veri = veri_gecici.copy()
-veri.info()
+# Temizlenmiş veriyi kaydedelim
+veri.to_csv("olimpiyatlar_temizlenmis.csv", index=False)
 
-# madalya alamayan sporcularin bulunmasi
-madalya_degiskeni = veri.madalya
-null_sayisi = pd.isnull(madalya_degiskeni).sum() # madalya alamayan sporcu sayisi
-
-madalya_degiskeni_filtresi = pd.isnull(madalya_degiskeni)
-
-veri = veri[~madalya_degiskeni_filtresi]
-
-veri.to_csv("olimpiyatlar_temizlenmis.csv", index = False)
-
-# %% tek degiskenli veri analizi
-import matplotlib.pyplot as plt
+# Tek değişkenli veri analizi
+sayisal_degisken = ["yas", "boy", "kilo", "yil"]
 
 def plotHistogram(degisken):
     plt.figure()
-    plt.hist(veri[degisken], bins =85, color = "orange")
+    plt.hist(veri[degisken], bins=85, color="orange")
     plt.xlabel(degisken)
     plt.show()
 
-sayisal_degisken = ["yas", "boy", "kilo", "yil"]
 for degisken in sayisal_degisken:
     plotHistogram(degisken)
-
 
 def plotBox(degisken):
     plt.figure()
@@ -156,3 +90,33 @@ def plotBox(degisken):
 sayisal_degisken = ["yas", "boy", "kilo"]
 for degisken in sayisal_degisken:
     plotBox(degisken)
+"""
+
+#korelasyon: 
+numeric_correlation=veri.loc[:,["yas","boy","kilo"]].corr()
+print(numeric_correlation)
+
+veri_gecici=veri.copy()
+veri_gecici=pd.get_dummies(veri_gecici,columns=["madalya"]) # madalya icin sayilar atamaliyiz cunku korelasyonu string ile yapamayiz
+
+#pivot tabla
+#madalya alan sporcuların cinsiyetlerine gore boy kilo yas ortalamalarina bakalim
+veri_pivot=veri.pivot_table(index="madalya",
+                            columns="cinsiyet",
+                            values=["boy","kilo","yas"],
+                            aggfunc={"boy":np.mean,
+                                     "kilo": np.median,
+                                     "yas": [np.min,np.max,np.std]})
+print(veri_pivot)
+
+"""
+# takımlara ve cinsiyete gore alinan madalya sayilarinin toplami max min degerleri
+veri_pivot2=veri.pivot_table(index="takim",
+                             columns="cinsiyet",
+                             values=["Gold","Silver","Bronze"],
+                             aggfunc={"Gold":[np.sum],
+                                      "Silver":[np.sum],
+                                      "Bronze":[np.sum]})
+print(veri_pivot2)
+"""
+print(veri.columns)
